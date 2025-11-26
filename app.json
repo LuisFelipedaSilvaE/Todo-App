@@ -18,7 +18,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.luis_felipe_07.TodoApp"
     },
     "web": {
       "output": "static",

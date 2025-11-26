@@ -11,7 +11,7 @@
     },
     "preview": {
       "android": {
-        "buildType": "apk" // 👈 Essa linha mágica força a gerar um APK
+        "buildType": "apk"
       },
       "distribution": "internal"
     },
