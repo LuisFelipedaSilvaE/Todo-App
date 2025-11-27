@@ -1,50 +1,94 @@
-# Welcome to your Expo app 👋
+# 📝 Todo App (React Native + Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Um aplicativo moderno de gerenciamento de tarefas desenvolvido com **React Native** e **Expo**. O projeto foca em performance, animações fluidas e persistência de dados local.
 
-## Get started
+![Badge React Native](https://img.shields.io/badge/tech-React%20Native-blue)
+![Badge Expo](https://img.shields.io/badge/tech-Expo-black)
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## ✨ Funcionalidades
 
-2. Start the app
+- **CRUD Completo:** Criar, Ler, Atualizar e Deletar tarefas.
+- **Persistência Local:** Dados salvos no dispositivo usando `AsyncStorage` (não perde ao fechar o app).
+- **Monitoramento de Prazos:** Indicadores visuais automáticos:
+  - 🟢 _On Track_ (No prazo)
+  - 🟠 _Due Today_ (Vence hoje)
+  - 🔴 _Overdue_ (Atrasado)
+- **Notificações Visuais:** Badge na aba indicando novas tarefas não vistas.
+- **Temas:** Suporte (preparado) para Light/Dark mode via Contexto.
+- **Interface:** Ícones vetoriais SVG e Layout responsivo.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🛠️ Tecnologias Utilizadas
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Core:** [React Native](https://reactnative.dev/) & [Expo](https://expo.dev/)
+- **Navegação:** [Expo Router](https://docs.expo.dev/router/introduction/) (Navegação baseada em arquivos)
+- **Animações:** [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)
+- **Armazenamento:** Async Storage
+- **Ícones:** SVG
+- **Gerenciamento de Estado:** React Context API (`TodoContext`, `DialogContext`, `ThemeContext`)
+- **Build:** EAS (Expo Application Services)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🚀 Como Rodar o Projeto
 
-When you're ready, run:
+### Pré-requisitos
 
-```bash
-npm run reset-project
-```
+- Node.js instalado.
+- Gerenciador de pacotes (NPM ou Yarn).
+- Celular com o app **Expo Go** ou Emulador Android/iOS configurado.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Passo a Passo
 
-## Learn more
+1.  **Clone o repositório:**
 
-To learn more about developing your project with Expo, look at the following resources:
+    ```bash
+    git clone [https://github.com/SEU-USUARIO/NOME-DO-REPO.git](https://github.com/SEU-USUARIO/NOME-DO-REPO.git)
+    cd NOME-DO-REPO
+    ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+2.  **Instale as dependências:**
 
-## Join the community
+    ```bash
+    npm install
+    # ou
+    yarn install
+    ```
 
-Join our community of developers creating universal apps.
+3.  **Inicie o servidor de desenvolvimento:**
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+    ```bash
+    npx expo start
+    ```
+
+    _Dica: Se tiver problemas com cache, use `npx expo start --clear`_
+
+4.  **Abra no celular:**
+    - Escaneie o QR Code com o app **Expo Go** (Android) ou Câmera (iOS).
+
+---
+
+## 📦 Gerando o APK (Android)
+
+Este projeto está configurado para o **EAS Build**. Para gerar um APK instalável que não depende do servidor de desenvolvimento:
+
+1.  **Instale a CLI do EAS:**
+
+    ```bash
+    npm install -g eas-cli
+    ```
+
+2.  **Faça login na sua conta Expo:**
+
+    ```bash
+    eas login
+    ```
+
+3.  **Gere o APK (Perfil Preview):**
+    ```bash
+    eas build -p android --profile preview
+    ```
+    _Isso irá gerar um link para baixar o arquivo .apk instalável._
