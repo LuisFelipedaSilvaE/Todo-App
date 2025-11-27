@@ -12,7 +12,11 @@ export function TodoProvider({ children }) {
     const loadTodos = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem("@todo_app_todos");
-        setTodos(JSON.parse(jsonValue));
+        if (jsonValue !== null) {
+          setTodos(JSON.parse(jsonValue));
+        } else {
+          setTodos([]);
+        }
       } catch (e) {
         console.error(e);
       } finally {
