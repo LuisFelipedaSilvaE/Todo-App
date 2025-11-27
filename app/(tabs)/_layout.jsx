@@ -1,16 +1,14 @@
-import { Colors } from "@/constants/Colors";
 import { Tabs } from "expo-router";
-import { useColorScheme } from "react-native";
 import FolderIcon from "@/assets/icons/folder-icon.svg";
 import OpenFolderIcon from "@/assets/icons/open-folder-icon.svg";
 import ClipBoardPlusIcon from "@/assets/icons/clipboard-plus-icon.svg";
 import ClipBoardPlusFillIcon from "@/assets/icons/clipboard-plus-fill-icon.svg";
 import { useTodos } from "@/context/TodoContext";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function RootLayout() {
   const { todos } = useTodos();
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === "dark" ? Colors.dark : Colors.light;
+  const { theme } = useTheme();
   const newItemsCount = todos.filter((todo) => !todo.seen).length;
 
   return (

@@ -1,11 +1,4 @@
-import {
-  Text,
-  View,
-  Pressable,
-  Platform,
-  StyleSheet,
-  FlatList,
-} from "react-native";
+import { Text, View, Pressable, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrashIcon from "@/assets/icons/trash-icon.svg";
 import PencilIcon from "@/assets/icons/pencil-icon.svg";
@@ -15,6 +8,12 @@ import { useCallback, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { useDialog } from "@/context/DialogContext";
 import { Link, useFocusEffect } from "expo-router";
+import Animated, {
+  FadeInDown,
+  FadeOutRight,
+  LinearTransition,
+} from "react-native-reanimated";
+import { StatusBar } from "expo-status-bar";
 
 export default function Index() {
   const { todos, isLoading, markAllAsSeen } = useTodos();
@@ -51,13 +50,11 @@ export default function Index() {
 
   useFocusEffect(
     useCallback(() => {
-      // Se tiver algum item não visto, marca como visto
-      // (Isso zera o badge assim que o usuário olha para a lista)
       const hasUnseen = todos.some((todo) => !todo.seen);
       if (hasUnseen) {
         markAllAsSeen();
       }
-    }, [todos, markAllAsSeen]) // Dependência importante
+    }, [todos, markAllAsSeen])
   );
 
   const handleUpdate = (todo) => {
@@ -87,7 +84,8 @@ export default function Index() {
     <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
       {!isLoading ? (
         <>
-          <FlatList
+          <Animated.FlatList
+            keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={{
               flex: todos.length > 0 ? 0 : 1,
               justifyContent: "center",
@@ -104,8 +102,13 @@ export default function Index() {
             }}
             data={todos}
             showsVerticalScrollIndicator={false}
+            itemLayoutAnimation={LinearTransition.springify()}
             renderItem={({ item }) => (
-              <View style={styles.todoContainer}>
+              <Animated.View
+                entering={FadeInDown}
+                exiting={FadeOutRight}
+                style={styles.todoContainer}
+              >
                 <Text style={styles.todoTitle}>{item.title}</Text>
                 <View style={styles.todoContentContainer}>
                   <View style={styles.statusContainer}>
@@ -163,7 +166,7 @@ export default function Index() {
                     </Pressable>
                   </View>
                 </View>
-              </View>
+              </Animated.View>
             )}
             ListHeaderComponent={() =>
               todos.length > 0 ? (
@@ -212,6 +215,7 @@ export default function Index() {
           />
         </>
       ) : undefined}
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
     </SafeAreaView>
   );
 }

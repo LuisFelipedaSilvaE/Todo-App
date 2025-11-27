@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const TodoContext = createContext({});
 
 export function TodoProvider({ children }) {
-  // const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id));
   const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
