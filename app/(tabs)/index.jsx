@@ -37,7 +37,7 @@ export default function Index() {
           ? withTiming(isDialogVisibleEnabled ? theme.background : "#ffffff", {
               duration: 175,
             })
-          : withTiming(isDialogVisibleEnabled ? "#ffffff" : theme.background, {
+          : withTiming(isDialogVisibleEnabled ? theme.background : "#000000", {
               duration: 175,
             }),
       transform: [
