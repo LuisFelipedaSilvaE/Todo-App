@@ -15,6 +15,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import CalendarPlusIcon from "@/assets/icons/calendar-plus-icon.svg";
 import CaretUpIcon from "@/assets/icons/caret-up-icon.svg";
 import CaretDownIcon from "@/assets/icons/caret-down-icon.svg";
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   const { createTodo, updateTodo } = useTodos();
@@ -24,17 +31,33 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   const [isFormOpen, setIsFormOpen] = useState(!isAnUpdate);
   const [showPicker, setShowPicker] = useState(false);
   const styles = createStyles(theme, colorScheme);
+  const isValid =
+    todo.title.trim() !== "" && todo.deadline.toString().trim() !== "";
+  const isValidUpdate =
+    todo.preUpdateTodoTitle !== todo.title &&
+    todo.preUpdateTodoDeadline !== todo.deadline &&
+    todo.preUpdateTodoCompleted !== todo.completed;
 
+  const animatedStyles = useAnimatedStyle(
+    () => ({
+      opacity: withTiming(isValid ? 1 : 0.25, {
+        duration: 500,
+      }),
+      transform: [
+        {
+          scale: withSpring(isValid ? 1.15 : 1, { duration: 500 }),
+        },
+      ],
+    }),
+    [isValid]
+  );
   function toggleDatePicker() {
     Keyboard.dismiss();
     setShowPicker((prevShowPicker) => !prevShowPicker);
   }
 
-  const valid =
-    todo.title.trim() !== "" && todo.deadline.toString().trim() !== "";
-
   const handleSubmit = () => {
-    if (valid) {
+    if (isValid) {
       createTodo({ ...todo, deadline: date.toISOString() });
       setTodo({
         title: "",
@@ -45,12 +68,8 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   };
 
   const handleUpdate = () => {
-    if (valid) {
-      if (
-        todo.preUpdateTodoTitle === todo.title &&
-        todo.preUpdateTodoDeadline === todo.deadline &&
-        todo.preUpdateTodoCompleted === todo.completed
-      ) {
+    if (isValid) {
+      if (!isValidUpdate) {
         setIsDialogVisible(false);
         return;
       }
@@ -248,25 +267,26 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
             </View>
           ) : undefined}
         </View>
-        <Pressable
+        <AnimatedPressable
           onPress={isAnUpdate ? handleUpdate : handleSubmit}
-          disabled={!valid}
-          style={({ pressed }) => ({
-            // Através da propriedade pressed podemos aplicar estilos enquanto o botão estiver sendo clicado
-            ...styles.addButton,
-            width: "25%",
-            backgroundColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
-            shadowColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
-            shadowOffset: { width: 2, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.85,
-            opacity: valid ? 1 : 0.25,
-          })}
+          disabled={!isValid}
+          style={[
+            {
+              ...styles.addButton,
+              width: 75,
+              backgroundColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+              shadowColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+              shadowOffset: { width: 2, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.85,
+            },
+            animatedStyles,
+          ]}
         >
           <Text style={styles.formButtonText}>
             {isAnUpdate ? "Update" : "Add"}
           </Text>
-        </Pressable>
+        </AnimatedPressable>
       </View>
     </>
   );
