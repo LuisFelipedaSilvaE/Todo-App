@@ -12,20 +12,67 @@ import Animated, {
   FadeInDown,
   FadeOutRight,
   LinearTransition,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
 
 export default function Index() {
-  const { todos, isLoading, markAllAsSeen } = useTodos();
+  const { todos, removeTodo, isLoading, markAllAsSeen } = useTodos();
   const { setIsDialogVisible, setDialogState } = useDialog();
   const [targetTodo, setTargetTodo] = useState({
     preUpdateTodoTitle: "",
     preUpdateTodoDeadline: "",
     preUpdateTodoCompleted: false,
   });
-
   const { colorScheme, theme } = useTheme();
   const styles = createStyles(theme, colorScheme);
+  const [isDialogVisibleEnabled, setIsDialogVisibleEnabled] = useState(true);
+
+  const animatedSwitchContent = useAnimatedStyle(
+    () => ({
+      backgroundColor:
+        colorScheme === "dark"
+          ? withTiming(isDialogVisibleEnabled ? theme.background : "#ffffff", {
+              duration: 175,
+            })
+          : withTiming(isDialogVisibleEnabled ? "#ffffff" : theme.background, {
+              duration: 175,
+            }),
+      transform: [
+        {
+          translateX: withSpring(isDialogVisibleEnabled ? 30 : 0, {
+            stiffness: 1500,
+            damping: 65,
+            mass: 2.5,
+          }),
+        },
+      ],
+    }),
+    [isDialogVisibleEnabled, colorScheme]
+  );
+  const animatedSwitchContainer = useAnimatedStyle(
+    () => ({
+      backgroundColor: withTiming(
+        isDialogVisibleEnabled ? "#38aaff" : "transparent",
+        {
+          duration: 175,
+        }
+      ),
+      borderColor: withTiming(
+        isDialogVisibleEnabled
+          ? "#38aaff"
+          : colorScheme === "dark"
+          ? "#7f7f7f"
+          : "#313131",
+        {
+          duration: 175,
+        }
+      ),
+    }),
+    [isDialogVisibleEnabled]
+  );
 
   const getDeadlineStatus = (currentDeadline) => {
     const today = new Date();
@@ -72,6 +119,11 @@ export default function Index() {
   };
 
   const handleDeletion = (todo) => {
+    if (!isDialogVisibleEnabled) {
+      removeTodo(todo.id);
+      return;
+    }
+
     setTargetTodo({ ...todo });
     setDialogState({
       isAnUpdate: false,
@@ -97,8 +149,8 @@ export default function Index() {
             }}
             ListHeaderComponentStyle={{
               width: "100%",
-              alignItems: "center",
               justifyContent: "center",
+              alignItems: "center",
             }}
             data={todos}
             showsVerticalScrollIndicator={false}
@@ -168,13 +220,14 @@ export default function Index() {
                 </View>
               </Animated.View>
             )}
-            ListHeaderComponent={() =>
+            ListHeaderComponent={
               todos.length > 0 ? (
                 <Text
                   style={{
                     color: theme.text,
                     fontSize: 18,
                     fontWeight: "bold",
+                    textAlign: "center",
                   }}
                 >
                   Keep track of your plans.
@@ -216,6 +269,44 @@ export default function Index() {
         </>
       ) : undefined}
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      {todos.length > 0 ? (
+        <Pressable
+          onPress={() =>
+            setIsDialogVisibleEnabled(
+              (prevIsDialogVisibleEnabled) => !prevIsDialogVisibleEnabled
+            )
+          }
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            gap: 12.5,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 10,
+            backgroundColor: theme.tint,
+            borderRadius: 5,
+          }}
+        >
+          <Animated.View
+            style={[styles.switchContainer, animatedSwitchContainer]}
+          >
+            <Animated.View
+              style={[styles.switchContent, animatedSwitchContent]}
+            ></Animated.View>
+          </Animated.View>
+          <Text
+            style={{
+              color: theme.text,
+              fontSize: 18,
+              fontWeight: "bold",
+            }}
+          >
+            {isDialogVisibleEnabled
+              ? "Disable deletion confirmation"
+              : "Enable deletion confirmation"}
+          </Text>
+        </Pressable>
+      ) : undefined}
     </SafeAreaView>
   );
 }
@@ -295,6 +386,21 @@ function createStyles(theme, colorScheme) {
       width: 35,
       backgroundColor: "#ff5050",
       padding: 5,
+    },
+    switchContainer: {
+      justifyContent: "center",
+      width: 57.5,
+      height: 25,
+      borderRadius: 20,
+      paddingVertical: 12.5,
+      paddingHorizontal: 2.5,
+      borderWidth: 1,
+      borderStyle: "solid",
+    },
+    switchContent: {
+      width: 20,
+      height: 20,
+      borderRadius: "50%",
     },
   });
 }
