@@ -32,19 +32,22 @@ export default function Index() {
 
   const animatedSwitchContent = useAnimatedStyle(
     () => ({
-      backgroundColor:
-        colorScheme === "dark"
-          ? withTiming(isDialogVisibleEnabled ? theme.background : "#ffffff", {
-              duration: 175,
-            })
-          : withTiming(isDialogVisibleEnabled ? theme.background : "#000000", {
-              duration: 175,
-            }),
+      backgroundColor: withTiming(
+        isDialogVisibleEnabled
+          ? theme.background
+          : colorScheme === "dark"
+          ? "#ffffff"
+          : "#000000",
+        {
+          duration: 300,
+        }
+      ),
       transform: [
         {
           translateX: withSpring(isDialogVisibleEnabled ? 30 : 0, {
+            duration: 300,
             stiffness: 1500,
-            damping: 65,
+            damping: 200,
             mass: 2.5,
           }),
         },
@@ -57,7 +60,7 @@ export default function Index() {
       backgroundColor: withTiming(
         isDialogVisibleEnabled ? "#38aaff" : "transparent",
         {
-          duration: 175,
+          duration: 300,
         }
       ),
       borderColor: withTiming(
@@ -67,7 +70,7 @@ export default function Index() {
           ? "#7f7f7f"
           : "#313131",
         {
-          duration: 175,
+          duration: 300,
         }
       ),
     }),
