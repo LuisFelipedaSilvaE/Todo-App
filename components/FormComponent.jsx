@@ -33,10 +33,10 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   const styles = createStyles(theme, colorScheme);
   const isValid =
     todo.title.trim() !== "" && todo.deadline.toString().trim() !== "";
-  const isValidUpdate =
-    todo.preUpdateTodoTitle !== todo.title &&
-    todo.preUpdateTodoDeadline !== todo.deadline &&
-    todo.preUpdateTodoCompleted !== todo.completed;
+  const isInvalidUpdate =
+    todo.preUpdateTodoTitle === todo.title &&
+    todo.preUpdateTodoDeadline === todo.deadline &&
+    todo.preUpdateTodoCompleted === todo.completed;
 
   const animatedStyles = useAnimatedStyle(
     () => ({
@@ -69,7 +69,7 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
 
   const handleUpdate = () => {
     if (isValid) {
-      if (!isValidUpdate) {
+      if (isInvalidUpdate) {
         setIsDialogVisible(false);
         return;
       }
@@ -113,8 +113,6 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
             <Text style={{ fontSize: 20, color: theme.text }}>
               Mark{" "}
               <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
                 style={{ fontWeight: "bold" }}
               >{`\'${todo.preUpdateTodoTitle}\'`}</Text>{" "}
               as:
