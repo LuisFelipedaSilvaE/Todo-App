@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "TodoApp",
-    "slug": "TodoApp",
+    "name": "Kaji",
+    "slug": "Kaji",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/main-icon.png",
-    "scheme": "todoapp",
+    "scheme": "kaji",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -19,7 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.luis_felipe_07.TodoApp"
+      "package": "com.luis_felipe_07.kaji"
     },
     "web": {
       "output": "static",
