@@ -13,15 +13,17 @@ import { useTheme } from "@/context/ThemeContext";
 import { useDialog } from "@/context/DialogContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CalendarPlusIcon from "@/assets/icons/calendar-plus-icon.svg";
-import CaretUpIcon from "@/assets/icons/caret-up-icon.svg";
-import CaretDownIcon from "@/assets/icons/caret-down-icon.svg";
+import CaretIcon from "@/assets/icons/caret-down-icon.svg";
 import Animated, {
+  FlipInXUp,
+  LinearTransition,
   useAnimatedStyle,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedCaretIcon = Animated.createAnimatedComponent(CaretIcon);
 
 export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   const { createTodo, updateTodo } = useTodos();
@@ -45,12 +47,29 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
       }),
       transform: [
         {
-          scale: withSpring(isValid ? 1.15 : 1, { duration: 500 }),
+          scale: withSpring(isValid ? 1.15 : 1, {
+            duration: 500,
+            stiffness: 1000,
+            damping: 140,
+            mass: 5,
+          }),
         },
       ],
     }),
     [isValid]
   );
+
+  const animatedCaretStyles = useAnimatedStyle(
+    () => ({
+      transform: [
+        {
+          rotate: withSpring(isFormOpen ? "180deg" : "0deg", { duration: 500 }),
+        },
+      ],
+    }),
+    [isFormOpen]
+  );
+
   function toggleDatePicker() {
     Keyboard.dismiss();
     setShowPicker((prevShowPicker) => !prevShowPicker);
@@ -155,7 +174,9 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
             </Pressable>
           </View>
         ) : undefined}
-        <View
+        <Animated.View
+          layout={LinearTransition.springify().duration(500)}
+          collapsable={false}
           style={{
             ...styles.accordion,
             borderWidth: isAnUpdate ? 1 : 0,
@@ -169,19 +190,12 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
                 borderBottomWidth: isFormOpen ? 1 : 0,
               }}
             >
-              {isFormOpen ? (
-                <CaretUpIcon
-                  width={25}
-                  height={25}
-                  fill={colorScheme === "dark" ? "#4e4e4e" : "#060606"}
-                />
-              ) : (
-                <CaretDownIcon
-                  width={25}
-                  height={25}
-                  fill={colorScheme === "dark" ? "#4e4e4e" : "#060606"}
-                />
-              )}
+              <AnimatedCaretIcon
+                width={25}
+                height={25}
+                style={[animatedCaretStyles]}
+                fill={colorScheme === "dark" ? "#4e4e4e" : "#060606"}
+              />
               <Text
                 style={{
                   flex: 1,
@@ -195,7 +209,8 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
             </Pressable>
           ) : undefined}
           {isFormOpen ? (
-            <View
+            <Animated.View
+              entering={isAnUpdate ? FlipInXUp.duration(500) : undefined}
               style={{
                 ...styles.todoMainDataContainer,
                 paddingHorizontal: isAnUpdate ? 30 : 0,
@@ -214,45 +229,45 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
                   }
                 />
               </View>
-              {!showPicker ? (
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputGroupLabel}>Todo Deadline</Text>
-                  <View style={styles.deadlineContainer}>
-                    <Pressable style={{ flex: 1 }} onPress={toggleDatePicker}>
-                      <TextInput
-                        style={{ ...styles.input, flex: 1 }}
-                        placeholder="dd/mm/YYYY"
-                        placeholderTextColor="gray"
-                        value={
-                          todo.deadline !== ""
-                            ? new Date(todo.deadline).toLocaleDateString()
-                            : todo.deadline
-                        }
-                        onChangeText={(text) =>
-                          setTodo((prevTodo) => ({
-                            ...prevTodo,
-                            deadline: text,
-                          }))
-                        }
-                        editable={false}
-                      />
-                    </Pressable>
-                    <Pressable
-                      style={{
-                        ...styles.addButton,
-                        backgroundColor: "#aa65ff",
-                        shadowColor: "#aa65ff",
-                        shadowOffset: { width: 2, height: 2 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.85,
-                      }}
-                      onPress={toggleDatePicker}
-                    >
-                      <CalendarPlusIcon width={25} height={25} fill={"white"} />
-                    </Pressable>
-                  </View>
+              {/* {!showPicker ? ( */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputGroupLabel}>Todo Deadline</Text>
+                <View style={styles.deadlineContainer}>
+                  <Pressable style={{ flex: 1 }} onPress={toggleDatePicker}>
+                    <TextInput
+                      style={{ ...styles.input, flex: 1 }}
+                      placeholder="dd/mm/YYYY"
+                      placeholderTextColor="gray"
+                      value={
+                        todo.deadline !== ""
+                          ? new Date(todo.deadline).toLocaleDateString()
+                          : todo.deadline
+                      }
+                      onChangeText={(text) =>
+                        setTodo((prevTodo) => ({
+                          ...prevTodo,
+                          deadline: text,
+                        }))
+                      }
+                      // editable={false}
+                    />
+                  </Pressable>
+                  <Pressable
+                    style={{
+                      ...styles.addButton,
+                      backgroundColor: "#aa65ff",
+                      shadowColor: "#aa65ff",
+                      shadowOffset: { width: 2, height: 2 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.85,
+                    }}
+                    onPress={toggleDatePicker}
+                  >
+                    <CalendarPlusIcon width={25} height={25} fill={"white"} />
+                  </Pressable>
                 </View>
-              ) : undefined}
+              </View>
+              {/* ) : undefined} */}
               {showPicker ? (
                 <DateTimePicker
                   value={date}
@@ -262,16 +277,16 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
                   minimumDate={new Date()}
                 />
               ) : undefined}
-            </View>
+            </Animated.View>
           ) : undefined}
-        </View>
+        </Animated.View>
         <AnimatedPressable
           onPress={isAnUpdate ? handleUpdate : handleSubmit}
           disabled={!isValid}
           style={[
             {
               ...styles.addButton,
-              width: 75,
+              minWidth: 75,
               backgroundColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
               shadowColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
               shadowOffset: { width: 2, height: 2 },
