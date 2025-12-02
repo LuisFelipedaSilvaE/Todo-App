@@ -20,11 +20,11 @@ export default function Form({ isAnUpdate }) {
         flex: 1,
         backgroundColor: theme.background,
       }}
-      edges={["top", "left", "right"]}
+      edges={["left", "right"]}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "android" ? "height" : "padding"}
-        keyboardVerticalOffset={0}
+        keyboardVerticalOffset={50}
         style={{
           flex: 1,
           gap: 17.5,
