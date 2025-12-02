@@ -1,4 +1,4 @@
-import { Text, View, Pressable, Platform, StyleSheet } from "react-native";
+import { Text, View, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrashIcon from "@/assets/icons/trash-icon.svg";
 import PencilIcon from "@/assets/icons/pencil-icon.svg";
@@ -12,15 +12,12 @@ import Animated, {
   FadeInDown,
   FadeOutRight,
   LinearTransition,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
 } from "react-native-reanimated";
-import { StatusBar } from "expo-status-bar";
 
 export default function Index() {
   const { todos, removeTodo, isLoading, markAllAsSeen } = useTodos();
-  const { setIsDialogVisible, setDialogState } = useDialog();
+  const { setIsDialogVisible, setDialogState, isDialogVisibleEnabled } =
+    useDialog();
   const [targetTodo, setTargetTodo] = useState({
     preUpdateTodoTitle: "",
     preUpdateTodoDeadline: "",
@@ -28,54 +25,6 @@ export default function Index() {
   });
   const { colorScheme, theme } = useTheme();
   const styles = createStyles(theme, colorScheme);
-  const [isDialogVisibleEnabled, setIsDialogVisibleEnabled] = useState(true);
-
-  const animatedSwitchContent = useAnimatedStyle(
-    () => ({
-      backgroundColor: withTiming(
-        isDialogVisibleEnabled
-          ? theme.background
-          : colorScheme === "dark"
-          ? "#ffffff"
-          : "#000000",
-        {
-          duration: 300,
-        }
-      ),
-      transform: [
-        {
-          translateX: withSpring(isDialogVisibleEnabled ? 30 : 0, {
-            duration: 300,
-            stiffness: 1500,
-            damping: 200,
-            mass: 2.5,
-          }),
-        },
-      ],
-    }),
-    [isDialogVisibleEnabled, colorScheme]
-  );
-  const animatedSwitchContainer = useAnimatedStyle(
-    () => ({
-      backgroundColor: withTiming(
-        isDialogVisibleEnabled ? "#38aaff" : "transparent",
-        {
-          duration: 300,
-        }
-      ),
-      borderColor: withTiming(
-        isDialogVisibleEnabled
-          ? "#38aaff"
-          : colorScheme === "dark"
-          ? "#7f7f7f"
-          : "#313131",
-        {
-          duration: 300,
-        }
-      ),
-    }),
-    [isDialogVisibleEnabled]
-  );
 
   const getDeadlineStatus = (currentDeadline) => {
     const today = new Date();
@@ -136,7 +85,7 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right", "top"]}>
+    <SafeAreaView style={styles.container} edges={["left", "right"]}>
       {!isLoading ? (
         <>
           <Animated.FlatList
@@ -148,12 +97,6 @@ export default function Index() {
               gap: 20,
               maxWidth: 1024,
               marginHorizontal: "auto",
-              paddingBottom: 20,
-            }}
-            ListHeaderComponentStyle={{
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
             }}
             data={todos}
             showsVerticalScrollIndicator={false}
@@ -223,20 +166,6 @@ export default function Index() {
                 </View>
               </Animated.View>
             )}
-            ListHeaderComponent={
-              todos.length > 0 ? (
-                <Text
-                  style={{
-                    color: theme.text,
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Keep track of your plans.
-                </Text>
-              ) : undefined
-            }
             ListEmptyComponent={() => (
               <View
                 style={{
@@ -271,45 +200,6 @@ export default function Index() {
           />
         </>
       ) : undefined}
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      {todos.length > 0 ? (
-        <Pressable
-          onPress={() =>
-            setIsDialogVisibleEnabled(
-              (prevIsDialogVisibleEnabled) => !prevIsDialogVisibleEnabled
-            )
-          }
-          style={{
-            width: "100%",
-            flexDirection: "row",
-            gap: 12.5,
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 10,
-            backgroundColor: theme.tint,
-            borderRadius: 5,
-          }}
-        >
-          <Animated.View
-            style={[styles.switchContainer, animatedSwitchContainer]}
-          >
-            <Animated.View
-              style={[styles.switchContent, animatedSwitchContent]}
-            ></Animated.View>
-          </Animated.View>
-          <Text
-            style={{
-              color: theme.text,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            {isDialogVisibleEnabled
-              ? "Disable deletion confirmation"
-              : "Enable deletion confirmation"}
-          </Text>
-        </Pressable>
-      ) : undefined}
     </SafeAreaView>
   );
 }
@@ -320,8 +210,7 @@ function createStyles(theme, colorScheme) {
       flex: 1,
       gap: 20,
       backgroundColor: theme.background,
-      paddingHorizontal: Platform.OS === "web" ? 25 : 25,
-      paddingVertical: Platform.OS === "web" ? 25 : 10,
+      padding: 17.5,
     },
     todoContainer: {
       flexGrow: 1,
@@ -381,29 +270,6 @@ function createStyles(theme, colorScheme) {
     currentDeadline: {
       color: theme.text,
       fontSize: 18,
-    },
-    closeDialog: {
-      alignSelf: "flex-end",
-      justifyContent: "center",
-      alignItems: "center",
-      width: 35,
-      backgroundColor: "#ff5050",
-      padding: 5,
-    },
-    switchContainer: {
-      justifyContent: "center",
-      width: 57.5,
-      height: 25,
-      borderRadius: 20,
-      paddingVertical: 12.5,
-      paddingHorizontal: 2.5,
-      borderWidth: 1,
-      borderStyle: "solid",
-    },
-    switchContent: {
-      width: 20,
-      height: 20,
-      borderRadius: "50%",
     },
   });
 }
