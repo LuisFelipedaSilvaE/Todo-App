@@ -2,10 +2,10 @@ import { useState } from "react";
 import { KeyboardAvoidingView, Platform, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormComponent from "@/components/FormComponent";
-import { useTheme } from "@/context/ThemeContext";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 export default function Form({ isAnUpdate }) {
-  const { theme } = useTheme();
+  const { theme } = useUserPreferences();
 
   const [todo, setTodo] = useState({
     title: "",

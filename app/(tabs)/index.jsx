@@ -5,7 +5,6 @@ import PencilIcon from "@/assets/icons/pencil-icon.svg";
 import { useTodos } from "@/context/TodoContext";
 import TodoDialogComponent from "@/components/TodoDialogComponent";
 import { useCallback, useState } from "react";
-import { useTheme } from "@/context/ThemeContext";
 import { useDialog } from "@/context/DialogContext";
 import { Link, useFocusEffect } from "expo-router";
 import Animated, {
@@ -13,9 +12,10 @@ import Animated, {
   FadeOutRight,
   LinearTransition,
 } from "react-native-reanimated";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 export default function Index() {
-  const { todos, removeTodo, isLoading, markAllAsSeen } = useTodos();
+  const { todos, removeTodo, markAllAsSeen } = useTodos();
   const { setIsDialogVisible, setDialogState, isDialogVisibleEnabled } =
     useDialog();
   const [targetTodo, setTargetTodo] = useState({
@@ -23,8 +23,11 @@ export default function Index() {
     preUpdateTodoDeadline: "",
     preUpdateTodoCompleted: false,
   });
-  const { colorScheme, theme } = useTheme();
-  const styles = createStyles(theme, colorScheme);
+  const {
+    userPreferences: { mode },
+    theme,
+  } = useUserPreferences();
+  const styles = createStyles(theme, mode);
 
   const getDeadlineStatus = (currentDeadline) => {
     const today = new Date();
@@ -86,125 +89,123 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.container} edges={["left", "right"]}>
-      {!isLoading ? (
-        <>
-          <Animated.FlatList
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{
-              flex: todos.length > 0 ? 0 : 1,
-              justifyContent: "center",
-              width: "100%",
-              gap: 20,
-              maxWidth: 1024,
-              marginHorizontal: "auto",
-            }}
-            data={todos}
-            showsVerticalScrollIndicator={false}
-            itemLayoutAnimation={LinearTransition.springify()}
-            renderItem={({ item }) => (
-              <Animated.View
-                entering={FadeInDown}
-                exiting={FadeOutRight}
-                style={styles.todoContainer}
-              >
-                <Text style={styles.todoTitle}>{item.title}</Text>
-                <View style={styles.todoContentContainer}>
-                  <View style={styles.statusContainer}>
-                    <Text style={styles.currentDeadline}>
-                      Current Deadline:{" "}
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {new Date(item.deadline).toLocaleDateString()}
-                      </Text>
-                    </Text>
-                    <Text style={styles.currentDeadline}>
-                      Deadline Status: {getDeadlineStatus(item.deadline)}
-                    </Text>
-                    <Text style={styles.statusMessage}>
-                      Todo Status:{" "}
-                      <Text
-                        style={{
-                          color: item.completed ? "#1dc717" : "#ec3535",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {item.completed ? "Completed" : "Incompleted"}
-                      </Text>
-                    </Text>
-                  </View>
-                  <View style={styles.actionContainer}>
-                    <Pressable
-                      onPress={() => handleUpdate(item)}
+      <>
+        <Animated.FlatList
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{
+            flex: todos.length > 0 ? 0 : 1,
+            justifyContent: "center",
+            width: "100%",
+            gap: 20,
+            maxWidth: 1024,
+            marginHorizontal: "auto",
+          }}
+          data={todos}
+          showsVerticalScrollIndicator={false}
+          itemLayoutAnimation={LinearTransition.springify()}
+          renderItem={({ item }) => (
+            <Animated.View
+              entering={FadeInDown}
+              exiting={FadeOutRight}
+              style={styles.todoContainer}
+            >
+              <Text style={styles.todoTitle}>{item.title}</Text>
+              <View style={styles.todoContentContainer}>
+                <View style={styles.statusContainer}>
+                  <Text style={styles.currentDeadline}>
+                    Current Deadline:{" "}
+                    <Text
                       style={{
-                        ...styles.todoAction,
-                        backgroundColor: "#38aaff",
-                        shadowColor: "#38aaff",
-                        shadowOffset: { width: 2, height: 2 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.85,
+                        fontWeight: "bold",
                       }}
                     >
-                      <PencilIcon width={25} height={25} fill={"white"} />
-                    </Pressable>
-                    <Pressable
-                      onPress={() => handleDeletion(item)}
-                      style={{
-                        ...styles.todoAction,
-                        backgroundColor: "#ff5050",
-                        shadowColor: "#ff5050",
-                        shadowOffset: { width: 2, height: 2 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.85,
-                      }}
-                    >
-                      <TrashIcon width={25} height={25} fill={"white"} />
-                    </Pressable>
-                  </View>
-                </View>
-              </Animated.View>
-            )}
-            ListEmptyComponent={() => (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 20,
-                }}
-              >
-                <Text style={{ color: theme.text, fontSize: 20 }}>
-                  No Todos Found
-                </Text>
-                <Link
-                  style={{
-                    ...styles.todoAction,
-                    backgroundColor: "#38aaff",
-                    shadowColor: "#38aaff",
-                    shadowOffset: { width: 2, height: 2 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.85,
-                  }}
-                  href={"/(tabs)/form"}
-                >
-                  <Text style={{ color: "white", fontSize: 18 }}>
-                    Create a new Todo
+                      {new Date(item.deadline).toLocaleDateString()}
+                    </Text>
                   </Text>
-                </Link>
+                  <Text style={styles.currentDeadline}>
+                    Deadline Status: {getDeadlineStatus(item.deadline)}
+                  </Text>
+                  <Text style={styles.statusMessage}>
+                    Todo Status:{" "}
+                    <Text
+                      style={{
+                        color: item.completed ? "#1dc717" : "#ec3535",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {item.completed ? "Completed" : "Incompleted"}
+                    </Text>
+                  </Text>
+                </View>
+                <View style={styles.actionContainer}>
+                  <Pressable
+                    onPress={() => handleUpdate(item)}
+                    style={{
+                      ...styles.todoAction,
+                      backgroundColor: "#38aaff",
+                      shadowColor: "#38aaff",
+                      shadowOffset: { width: 2, height: 2 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.85,
+                    }}
+                  >
+                    <PencilIcon width={25} height={25} fill={"white"} />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => handleDeletion(item)}
+                    style={{
+                      ...styles.todoAction,
+                      backgroundColor: "#ff5050",
+                      shadowColor: "#ff5050",
+                      shadowOffset: { width: 2, height: 2 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3.85,
+                    }}
+                  >
+                    <TrashIcon width={25} height={25} fill={"white"} />
+                  </Pressable>
+                </View>
               </View>
-            )}
-          />
-          <TodoDialogComponent
-            currentTodo={{ todo: targetTodo, setTodo: setTargetTodo }}
-          />
-        </>
-      ) : undefined}
+            </Animated.View>
+          )}
+          ListEmptyComponent={() => (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 20,
+              }}
+            >
+              <Text style={{ color: theme.text, fontSize: 20 }}>
+                No Todos Found
+              </Text>
+              <Link
+                style={{
+                  ...styles.todoAction,
+                  backgroundColor: "#38aaff",
+                  shadowColor: "#38aaff",
+                  shadowOffset: { width: 2, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.85,
+                }}
+                href={"/(tabs)/form"}
+              >
+                <Text style={{ color: "white", fontSize: 18 }}>
+                  Create a new Todo
+                </Text>
+              </Link>
+            </View>
+          )}
+        />
+        <TodoDialogComponent
+          currentTodo={{ todo: targetTodo, setTodo: setTargetTodo }}
+        />
+      </>
     </SafeAreaView>
   );
 }
 
-function createStyles(theme, colorScheme) {
+function createStyles(theme, mode) {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -216,7 +217,7 @@ function createStyles(theme, colorScheme) {
       flexGrow: 1,
       justifyContent: "center",
       alignItems: "center",
-      borderColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+      borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderWidth: 1,
       borderStyle: "solid",
       borderRadius: 5,
@@ -230,7 +231,7 @@ function createStyles(theme, colorScheme) {
       width: "100%",
       textAlign: "center",
       color: theme.text,
-      borderBottomColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+      borderBottomColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderBottomWidth: 1,
       paddingHorizontal: 10,
       paddingVertical: 5,
@@ -241,7 +242,7 @@ function createStyles(theme, colorScheme) {
       flex: 1,
       padding: 15,
       gap: 10,
-      borderRightColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+      borderRightColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderRightWidth: 1,
     },
     statusMessage: {

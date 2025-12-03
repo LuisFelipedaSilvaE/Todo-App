@@ -4,10 +4,9 @@ const DialogContext = createContext({});
 
 export function DialogProvider({ children }) {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [isDialogVisibleEnabled, setIsDialogVisibleEnabled] = useState(true);
   const [dialogState, setDialogState] = useState({
     isAnUpdate: false,
-    isADelition: false,
+    isADeletion: false,
   });
 
   return (
@@ -17,8 +16,6 @@ export function DialogProvider({ children }) {
         setIsDialogVisible,
         dialogState,
         setDialogState,
-        isDialogVisibleEnabled,
-        setIsDialogVisibleEnabled,
       }}
     >
       {children}

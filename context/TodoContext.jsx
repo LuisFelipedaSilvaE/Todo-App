@@ -10,7 +10,7 @@ export function TodoProvider({ children }) {
   useEffect(() => {
     const loadTodos = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem("@todo_app_todos");
+        const jsonValue = await AsyncStorage.getItem("@kaji_todos");
         if (jsonValue !== null) {
           setTodos(JSON.parse(jsonValue));
         } else {
@@ -30,7 +30,7 @@ export function TodoProvider({ children }) {
       try {
         if (!isLoading) {
           const jsonValue = JSON.stringify(todos);
-          await AsyncStorage.setItem("@todo_app_todos", jsonValue);
+          await AsyncStorage.setItem("@kaji_todos", jsonValue);
         }
       } catch (e) {
         console.error(e);

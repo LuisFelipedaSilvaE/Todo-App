@@ -4,16 +4,26 @@ import OpenFolderIcon from "@/assets/icons/open-folder-icon.svg";
 import ClipBoardPlusIcon from "@/assets/icons/clipboard-plus-icon.svg";
 import ClipBoardPlusFillIcon from "@/assets/icons/clipboard-plus-fill-icon.svg";
 import { useTodos } from "@/context/TodoContext";
-import { useTheme } from "@/context/ThemeContext";
 import CustomHeader from "@/components/CustomHeader";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import * as SystemUI from "expo-system-ui";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 export default function RootLayout() {
-  const { todos } = useTodos();
-  const { theme } = useTheme();
+  const { todos, isLoading } = useTodos();
+  const {
+    userPreferences: { mode },
+    theme,
+    isUserPreferencesLoading,
+  } = useUserPreferences();
   const newItemsCount = todos.filter((todo) => !todo.seen).length;
 
-  return (
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(mode === "dark" ? "#151718" : "#ffffff");
+  }, [mode]);
+
+  return !isLoading && !isUserPreferencesLoading ? (
     <>
       <Tabs
         screenOptions={{
@@ -30,7 +40,13 @@ export default function RootLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            header: () => <CustomHeader title={"Kaji"} />,
+            header: () => (
+              <CustomHeader
+                title={"Kaji"}
+                showBackButton={false}
+                showConfigurationButton={true}
+              />
+            ),
             title: "Todos",
             tabBarIcon: ({ color, focused }) =>
               focused ? (
@@ -49,7 +65,13 @@ export default function RootLayout() {
         <Tabs.Screen
           name="form"
           options={{
-            header: () => <CustomHeader title={"Form"} />,
+            header: () => (
+              <CustomHeader
+                title={"Form"}
+                showBackButton={false}
+                showConfigurationButton={true}
+              />
+            ),
             title: "Form",
             tabBarIcon: ({ color, focused }) =>
               focused ? (
@@ -59,16 +81,8 @@ export default function RootLayout() {
               ),
           }}
         />
-        <Tabs.Screen
-          name="configurations"
-          options={{
-            header: () => <CustomHeader title={"Configurations"} />,
-            href: null,
-            tabBarStyle: { display: "none" },
-          }}
-        />
       </Tabs>
-      <StatusBar style={"auto"} />
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
     </>
-  );
+  ) : undefined;
 }

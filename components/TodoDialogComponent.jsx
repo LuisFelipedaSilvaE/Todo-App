@@ -6,18 +6,21 @@ import {
   View,
   ScrollView,
 } from "react-native";
-import { useTheme } from "@/context/ThemeContext";
 import FormComponent from "./FormComponent";
 import { useDialog } from "@/context/DialogContext";
 import XIcon from "@/assets/icons/x-icon.svg";
 import TrashIcon from "@/assets/icons/trash-icon.svg";
 import { useTodos } from "@/context/TodoContext";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 export default function TodoDialogComponent({ currentTodo }) {
   const { removeTodo } = useTodos();
   const { isDialogVisible, setIsDialogVisible, dialogState } = useDialog();
-  const { colorScheme, theme } = useTheme();
-  const styles = createStyles(theme, colorScheme);
+  const {
+    userPreferences: { mode },
+    theme,
+  } = useUserPreferences();
+  const styles = createStyles(theme, mode);
   const { todo: targetTodo } = currentTodo;
 
   const handleTodoDeletion = () => {
@@ -114,13 +117,13 @@ export default function TodoDialogComponent({ currentTodo }) {
   );
 }
 
-function createStyles(theme, colorScheme) {
+function createStyles(theme, mode) {
   return StyleSheet.create({
     closeDialogContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      backgroundColor: colorScheme === "dark" ? "#313131" : "#eaeaea",
+      backgroundColor: mode === "dark" ? "#313131" : "#eaeaea",
     },
     closeDialog: {
       alignSelf: "flex-end",

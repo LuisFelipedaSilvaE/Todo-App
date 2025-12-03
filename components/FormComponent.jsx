@@ -9,7 +9,6 @@ import {
   View,
 } from "react-native";
 import { useTodos } from "@/context/TodoContext";
-import { useTheme } from "@/context/ThemeContext";
 import { useDialog } from "@/context/DialogContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CalendarPlusIcon from "@/assets/icons/calendar-plus-icon.svg";
@@ -21,18 +20,22 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedCaretIcon = Animated.createAnimatedComponent(CaretIcon);
 
 export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   const { createTodo, updateTodo } = useTodos();
-  const { colorScheme, theme } = useTheme();
+  const {
+    userPreferences: { mode },
+    theme,
+  } = useUserPreferences();
   const { setIsDialogVisible } = useDialog();
   const [date, setDate] = useState(new Date());
   const [isFormOpen, setIsFormOpen] = useState(!isAnUpdate);
   const [showPicker, setShowPicker] = useState(false);
-  const styles = createStyles(theme, colorScheme);
+  const styles = createStyles(theme, mode);
   const isValid =
     todo.title.trim() !== "" && todo.deadline.toString().trim() !== "";
   const isInvalidUpdate =
@@ -175,7 +178,9 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
           </View>
         ) : undefined}
         <Animated.View
-          layout={LinearTransition.springify().duration(500)}
+          layout={
+            isAnUpdate ? LinearTransition.springify().duration(500) : undefined
+          }
           collapsable={false}
           style={{
             ...styles.accordion,
@@ -194,7 +199,7 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
                 width={25}
                 height={25}
                 style={[animatedCaretStyles]}
-                fill={colorScheme === "dark" ? "#4e4e4e" : "#060606"}
+                fill={mode === "dark" ? "#4e4e4e" : "#060606"}
               />
               <Text
                 style={{
@@ -229,45 +234,45 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
                   }
                 />
               </View>
-              {/* {!showPicker ? ( */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputGroupLabel}>Todo Deadline</Text>
-                <View style={styles.deadlineContainer}>
-                  <Pressable style={{ flex: 1 }} onPress={toggleDatePicker}>
-                    <TextInput
-                      style={{ ...styles.input, flex: 1 }}
-                      placeholder="dd/mm/YYYY"
-                      placeholderTextColor="gray"
-                      value={
-                        todo.deadline !== ""
-                          ? new Date(todo.deadline).toLocaleDateString()
-                          : todo.deadline
-                      }
-                      onChangeText={(text) =>
-                        setTodo((prevTodo) => ({
-                          ...prevTodo,
-                          deadline: text,
-                        }))
-                      }
-                      // editable={false}
-                    />
-                  </Pressable>
-                  <Pressable
-                    style={{
-                      ...styles.addButton,
-                      backgroundColor: "#aa65ff",
-                      shadowColor: "#aa65ff",
-                      shadowOffset: { width: 2, height: 2 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.85,
-                    }}
-                    onPress={toggleDatePicker}
-                  >
-                    <CalendarPlusIcon width={25} height={25} fill={"white"} />
-                  </Pressable>
+              {!showPicker ? (
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputGroupLabel}>Todo Deadline</Text>
+                  <View style={styles.deadlineContainer}>
+                    <Pressable style={{ flex: 1 }} onPress={toggleDatePicker}>
+                      <TextInput
+                        style={{ ...styles.input, flex: 1 }}
+                        placeholder="dd/mm/YYYY"
+                        placeholderTextColor="gray"
+                        value={
+                          todo.deadline !== ""
+                            ? new Date(todo.deadline).toLocaleDateString()
+                            : todo.deadline
+                        }
+                        onChangeText={(text) =>
+                          setTodo((prevTodo) => ({
+                            ...prevTodo,
+                            deadline: text,
+                          }))
+                        }
+                        editable={false}
+                      />
+                    </Pressable>
+                    <Pressable
+                      style={{
+                        ...styles.addButton,
+                        backgroundColor: "#aa65ff",
+                        shadowColor: "#aa65ff",
+                        shadowOffset: { width: 2, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.85,
+                      }}
+                      onPress={toggleDatePicker}
+                    >
+                      <CalendarPlusIcon width={25} height={25} fill={"white"} />
+                    </Pressable>
+                  </View>
                 </View>
-              </View>
-              {/* ) : undefined} */}
+              ) : undefined}
               {showPicker ? (
                 <DateTimePicker
                   value={date}
@@ -287,8 +292,8 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
             {
               ...styles.addButton,
               minWidth: 75,
-              backgroundColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
-              shadowColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+              backgroundColor: mode === "dark" ? "#4e4e4e" : "#060606",
+              shadowColor: mode === "dark" ? "#4e4e4e" : "#060606",
               shadowOffset: { width: 2, height: 2 },
               shadowOpacity: 0.25,
               shadowRadius: 3.85,
@@ -305,7 +310,7 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
   );
 }
 
-function createStyles(theme, colorScheme) {
+function createStyles(theme, mode) {
   return StyleSheet.create({
     formContainer: {
       width: "100%",
@@ -327,7 +332,7 @@ function createStyles(theme, colorScheme) {
     },
     input: {
       width: "100%",
-      borderColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+      borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderStyle: "solid",
       fontSize: 18,
       borderWidth: 1,
@@ -368,7 +373,7 @@ function createStyles(theme, colorScheme) {
       alignItems: "center",
       borderRadius: "50%",
       backgroundColor: "transparent",
-      borderColor: colorScheme === "dark" ? "#7f7f7f" : "#313131",
+      borderColor: mode === "dark" ? "#7f7f7f" : "#313131",
       borderWidth: 1,
       borderStyle: "solid",
     },
@@ -386,11 +391,11 @@ function createStyles(theme, colorScheme) {
       paddingHorizontal: 7.5,
       justifyContent: "space-between",
       alignItems: "center",
-      borderColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+      borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderStyle: "solid",
     },
     accordion: {
-      borderColor: colorScheme === "dark" ? "#4e4e4e" : "#060606",
+      borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderStyle: "solid",
       borderRadius: 5,
       overflow: "hidden",
