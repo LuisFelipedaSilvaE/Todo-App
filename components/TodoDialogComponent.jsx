@@ -33,37 +33,44 @@ export default function TodoDialogComponent({ currentTodo }) {
       visible={isDialogVisible}
       animationType="fade"
       onRequestClose={() => setIsDialogVisible(false)}
+      transparent={true}
+      navigationBarTranslucent={true}
+      statusBarTranslucent={true}
     >
-      <View style={styles.closeDialogContainer}>
-        <Text
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          style={{
-            fontSize: 25,
-            paddingHorizontal: 10,
-            color: theme.text,
-            textAlign: "center",
-            flex: 1,
-          }}
-        >
-          {dialogState.isAnUpdate ? "Editing: " : undefined}
-          <Text style={{ fontWeight: "bold" }}>
-            {dialogState.isAnUpdate
-              ? targetTodo.preUpdateTodoTitle
-              : targetTodo.title}
-          </Text>
-        </Text>
-        <Pressable
-          style={styles.closeDialog}
-          onPress={() => setIsDialogVisible(false)}
-        >
-          <XIcon width={25} height={25} fill={"white"} />
-        </Pressable>
-      </View>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          backgroundColor: "#000000bf",
+        }}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.closeDialogContainer}>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{
+              fontSize: 25,
+              paddingHorizontal: 10,
+              color: theme.text,
+              textAlign: "center",
+              flex: 1,
+            }}
+          >
+            {dialogState.isAnUpdate ? "Editing: " : undefined}
+            <Text style={{ fontWeight: "bold" }}>
+              {dialogState.isAnUpdate
+                ? targetTodo.preUpdateTodoTitle
+                : targetTodo.title}
+            </Text>
+          </Text>
+          <Pressable
+            style={styles.closeDialog}
+            onPress={() => setIsDialogVisible(false)}
+          >
+            <XIcon width={25} height={25} fill={"white"} />
+          </Pressable>
+        </View>
         <View style={styles.mainContent}>
           {dialogState.isAnUpdate ? (
             <FormComponent isAnUpdate={true} todo={currentTodo} />
@@ -79,10 +86,7 @@ export default function TodoDialogComponent({ currentTodo }) {
                   style={{
                     ...styles.todoAction,
                     backgroundColor: "#ff5050",
-                    shadowColor: "#ff5050",
-                    shadowOffset: { width: 2, height: 2 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.85,
+                    boxShadow: "-2px 2px 0px 2px #ff505080",
                   }}
                 >
                   <View style={styles.deleteStateButtonTextContainer}>
@@ -97,10 +101,7 @@ export default function TodoDialogComponent({ currentTodo }) {
                   style={{
                     ...styles.todoAction,
                     backgroundColor: "#aa65ff",
-                    shadowColor: "#aa65ff",
-                    shadowOffset: { width: 2, height: 2 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.85,
+                    boxShadow: "-2px 2px 0px 2px #aa65ff80",
                   }}
                 >
                   <View style={styles.deleteStateButtonTextContainer}>
@@ -124,18 +125,18 @@ function createStyles(theme, mode) {
       justifyContent: "space-between",
       alignItems: "center",
       backgroundColor: mode === "dark" ? "#313131" : "#eaeaea",
+      zIndex: 1,
     },
     closeDialog: {
       alignSelf: "flex-end",
       justifyContent: "center",
       alignItems: "center",
       width: 35,
-      backgroundColor: "#ff5050",
+      backgroundColor: mode === "dark" ? "#414141" : "#dadada",
       padding: 5,
     },
     mainContent: {
       width: "100%",
-      flex: 1,
       gap: 20,
       padding: 15,
       justifyContent: "center",
@@ -158,7 +159,6 @@ function createStyles(theme, mode) {
       borderRadius: 5,
       paddingVertical: 7.5,
       paddingHorizontal: 10,
-      elevation: 15,
     },
     deleteStateButtonTextContainer: {
       flexDirection: "row",

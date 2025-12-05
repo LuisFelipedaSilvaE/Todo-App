@@ -12,6 +12,7 @@ import { useTodos } from "@/context/TodoContext";
 import { useDialog } from "@/context/DialogContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CalendarPlusIcon from "@/assets/icons/calendar-plus-icon.svg";
+import TagIcon from "@/assets/icons/tag-icon.svg";
 import CaretIcon from "@/assets/icons/caret-down-icon.svg";
 import Animated, {
   FlipInXUp,
@@ -224,25 +225,46 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
             >
               <View style={styles.inputGroup}>
                 <Text style={styles.inputGroupLabel}>Todo Title</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Add a new Todo title"
-                  placeholderTextColor="gray"
-                  value={todo.title}
-                  onChangeText={(text) =>
-                    setTodo((prevTodo) => ({ ...prevTodo, title: text }))
-                  }
-                />
+                <View style={styles.inputContainer}>
+                  <View style={{ ...styles.button, ...styles.inputContext }}>
+                    <TagIcon width={25} height={25} fill={"white"} />
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Add a new Todo title"
+                    placeholderTextColor="gray"
+                    value={todo.title}
+                    onChangeText={(text) =>
+                      setTodo((prevTodo) => ({ ...prevTodo, title: text }))
+                    }
+                  />
+                </View>
               </View>
               {!showPicker ? (
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputGroupLabel}>Todo Deadline</Text>
-                  <View style={styles.deadlineContainer}>
-                    <Pressable style={{ flex: 1 }} onPress={toggleDatePicker}>
+                  <View style={styles.inputContainer}>
+                    <Pressable
+                      style={{ flex: 1, flexDirection: "row" }}
+                      onPress={toggleDatePicker}
+                    >
+                      <View
+                        style={{
+                          ...styles.button,
+                          ...styles.inputContext,
+                        }}
+                      >
+                        <CalendarPlusIcon
+                          width={25}
+                          height={25}
+                          fill={"white"}
+                        />
+                      </View>
                       <TextInput
                         style={{ ...styles.input, flex: 1 }}
                         placeholder="dd/mm/YYYY"
                         placeholderTextColor="gray"
+                        editable={false}
                         value={
                           todo.deadline !== ""
                             ? new Date(todo.deadline).toLocaleDateString()
@@ -254,21 +276,7 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
                             deadline: text,
                           }))
                         }
-                        editable={false}
                       />
-                    </Pressable>
-                    <Pressable
-                      style={{
-                        ...styles.addButton,
-                        backgroundColor: "#aa65ff",
-                        shadowColor: "#aa65ff",
-                        shadowOffset: { width: 2, height: 2 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 3.85,
-                      }}
-                      onPress={toggleDatePicker}
-                    >
-                      <CalendarPlusIcon width={25} height={25} fill={"white"} />
                     </Pressable>
                   </View>
                 </View>
@@ -290,13 +298,12 @@ export default function FormComponent({ isAnUpdate, todo: { todo, setTodo } }) {
           disabled={!isValid}
           style={[
             {
-              ...styles.addButton,
+              ...styles.button,
               minWidth: 75,
               backgroundColor: mode === "dark" ? "#4e4e4e" : "#060606",
-              shadowColor: mode === "dark" ? "#4e4e4e" : "#060606",
-              shadowOffset: { width: 2, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.85,
+              boxShadow: `-1px 1px 0px 2px ${
+                mode === "dark" ? "#4e4e4e80" : "#06060680"
+              }`,
             },
             animatedStyles,
           ]}
@@ -317,35 +324,46 @@ function createStyles(theme, mode) {
       gap: 25,
       maxWidth: 1024,
       marginHorizontal: "auto",
-      pointerEvents: "auto",
     },
     todoMainDataContainer: {
       width: "100%",
       gap: 7.5,
       justifyContent: "center",
       marginHorizontal: "auto",
-      pointerEvents: "auto",
     },
-    deadlineContainer: {
+    inputContainer: {
       flexDirection: "row",
-      gap: 10,
+      borderRadius: 5,
+      boxShadow: `-1px 2px 0px 1px ${
+        mode === "dark" ? "#4e4e4e80" : "#06060680"
+      }`,
     },
     input: {
-      width: "100%",
+      flex: 1,
       borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderStyle: "solid",
-      fontSize: 18,
       borderWidth: 1,
+      fontSize: 18,
       borderRadius: 5,
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
       color: theme.text,
       padding: 10,
       minWidth: 0,
+      borderLeftWidth: 0,
     },
-    addButton: {
+    button: {
       padding: 10,
       borderRadius: 5,
       alignSelf: "center",
-      elevation: 10,
+    },
+    inputContext: {
+      borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
+      backgroundColor: mode === "dark" ? "#4e4e4e80" : "#06060680",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
     },
     formButtonText: {
       color: "white",
@@ -398,7 +416,6 @@ function createStyles(theme, mode) {
       borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
       borderStyle: "solid",
       borderRadius: 5,
-      overflow: "hidden",
     },
     inputGroup: {
       gap: 5,

@@ -9,6 +9,7 @@ const userPreferencesContext = createContext();
 export function UserPreferencesProvider({ children }) {
   const colorScheme = useColorScheme();
   const [userPreferences, setUserPreferences] = useState({});
+  const [isDefault, setIsDefault] = useState(true);
   const [isUserPreferencesLoading, setIsUserPreferencesLoading] =
     useState(true);
   const theme = userPreferences.mode === "dark" ? Colors.dark : Colors.light;
@@ -16,10 +17,6 @@ export function UserPreferencesProvider({ children }) {
   useEffect(() => {
     const updateAndroidNavigationBar = async () => {
       if (Platform.OS === "android") {
-        await NavigationBar.setBackgroundColorAsync(
-          userPreferences.mode === "dark" ? "#000000" : "#ffffff"
-        );
-
         await NavigationBar.setButtonStyleAsync(
           userPreferences.mode === "dark" ? "light" : "dark"
         );
@@ -72,6 +69,9 @@ export function UserPreferencesProvider({ children }) {
         isUserPreferencesLoading,
         setIsUserPreferencesLoading,
         theme,
+        colorScheme,
+        isDefault,
+        setIsDefault,
       }}
     >
       {children}

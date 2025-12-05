@@ -16,15 +16,14 @@ import { useUserPreferences } from "@/context/UserPreferencesContext";
 
 export default function Index() {
   const { todos, removeTodo, markAllAsSeen } = useTodos();
-  const { setIsDialogVisible, setDialogState, isDialogVisibleEnabled } =
-    useDialog();
+  const { setIsDialogVisible, setDialogState } = useDialog();
   const [targetTodo, setTargetTodo] = useState({
     preUpdateTodoTitle: "",
     preUpdateTodoDeadline: "",
     preUpdateTodoCompleted: false,
   });
   const {
-    userPreferences: { mode },
+    userPreferences: { mode, isDeletionConfirmationEnabled },
     theme,
   } = useUserPreferences();
   const styles = createStyles(theme, mode);
@@ -74,7 +73,7 @@ export default function Index() {
   };
 
   const handleDeletion = (todo) => {
-    if (!isDialogVisibleEnabled) {
+    if (!isDeletionConfirmationEnabled) {
       removeTodo(todo.id);
       return;
     }
@@ -88,8 +87,8 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right"]}>
-      <>
+    <>
+      <SafeAreaView style={styles.container} edges={["left", "right"]}>
         <Animated.FlatList
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{
@@ -102,7 +101,7 @@ export default function Index() {
           }}
           data={todos}
           showsVerticalScrollIndicator={false}
-          itemLayoutAnimation={LinearTransition.springify()}
+          itemLayoutAnimation={LinearTransition.springify().duration(500)}
           renderItem={({ item }) => (
             <Animated.View
               entering={FadeInDown}
@@ -143,10 +142,7 @@ export default function Index() {
                     style={{
                       ...styles.todoAction,
                       backgroundColor: "#38aaff",
-                      shadowColor: "#38aaff",
-                      shadowOffset: { width: 2, height: 2 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.85,
+                      boxShadow: "-2px 2px 0px 2px #38aaff80",
                     }}
                   >
                     <PencilIcon width={25} height={25} fill={"white"} />
@@ -156,10 +152,7 @@ export default function Index() {
                     style={{
                       ...styles.todoAction,
                       backgroundColor: "#ff5050",
-                      shadowColor: "#ff5050",
-                      shadowOffset: { width: 2, height: 2 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.85,
+                      boxShadow: "-2px 2px 0px 2px #ff505080",
                     }}
                   >
                     <TrashIcon width={25} height={25} fill={"white"} />
@@ -183,10 +176,7 @@ export default function Index() {
                 style={{
                   ...styles.todoAction,
                   backgroundColor: "#38aaff",
-                  shadowColor: "#38aaff",
-                  shadowOffset: { width: 2, height: 2 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.85,
+                  boxShadow: "-2px 2px 0px 2px #38aaff80",
                 }}
                 href={"/(tabs)/form"}
               >
@@ -197,11 +187,11 @@ export default function Index() {
             </View>
           )}
         />
-        <TodoDialogComponent
-          currentTodo={{ todo: targetTodo, setTodo: setTargetTodo }}
-        />
-      </>
-    </SafeAreaView>
+      </SafeAreaView>
+      <TodoDialogComponent
+        currentTodo={{ todo: targetTodo, setTodo: setTargetTodo }}
+      />
+    </>
   );
 }
 
@@ -210,11 +200,12 @@ function createStyles(theme, mode) {
     container: {
       flex: 1,
       gap: 20,
+      justifyContent: "center",
       backgroundColor: theme.background,
       padding: 17.5,
     },
     todoContainer: {
-      flexGrow: 1,
+      flex: 1,
       justifyContent: "center",
       alignItems: "center",
       borderColor: mode === "dark" ? "#4e4e4e" : "#060606",
@@ -254,7 +245,7 @@ function createStyles(theme, mode) {
       alignItems: "center",
       flexDirection: "row",
       flex: 1,
-      gap: 5,
+      gap: 7.5,
       padding: 15,
     },
     todoContentContainer: {
@@ -266,7 +257,6 @@ function createStyles(theme, mode) {
     todoAction: {
       borderRadius: 5,
       padding: 7.5,
-      elevation: 15,
     },
     currentDeadline: {
       color: theme.text,
